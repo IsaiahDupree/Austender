@@ -1,0 +1,23 @@
+{
+  "runs": [
+    {
+      "timestamp": "2025-04-20T17:29:09.177957",
+      "approaches": {}
+    }
+  ],
+  "multi_tool": {
+    "success_rate": [],
+    "data_count": [],
+    "duration": []
+  },
+  "focused": {
+    "success_rate": [],
+    "data_count": [],
+    "duration": []
+  },
+  "agentic": {
+    "success_rate": [],
+    "data_count": [],
+    "duration": []
+  }
+}

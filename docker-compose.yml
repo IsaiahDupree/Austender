@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # API and Web Server
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - app-network
+    command: python main.py --api-only
+
+  # Scheduler for automated tasks
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - app-network
+    command: python main.py --scheduler-only
+    depends_on:
+      - app
+
+  # Advanced Browser Scraper for Government Tender Opportunities
+  scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: unless-stopped
+    networks:
+      - app-network
+    # Run scraper with different options - can be customized
+    command: --site austender --category construction --pages 3 --details --save
+    depends_on:
+      - app
+
+  # Schedule regular scans for new opportunities
+  scan-scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile.scraper
+    volumes:
+      - ./database:/app/database
+      - ./logs:/app/logs
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SCAN_INTERVAL=12 # hours
+    restart: unless-stopped
+    networks:
+      - app-network
+    # Run the scheduler script that will trigger scans at regular intervals
+    command: --scheduler --interval 12 --sources austender,nsw_etender
+    depends_on:
+      - app
+
+networks:
+  app-network:
+    driver: bridge

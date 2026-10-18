@@ -1,0 +1,21 @@
+# Core dependencies
+requests>=2.28.0
+beautifulsoup4>=4.11.0
+selenium>=4.10.0
+playwright>=1.32.0
+webdriver-manager>=3.8.0
+tenacity>=8.2.0
+colorama>=0.4.6
+python-dotenv>=1.0.0
+
+# Database interaction
+sqlalchemy>=1.4.39
+
+# Date and time handling
+python-dateutil>=2.8.2
+
+# Scheduling
+schedule>=1.2.0
+
+# Utility
+tqdm>=4.64.1

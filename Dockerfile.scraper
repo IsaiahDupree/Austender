@@ -1,0 +1,25 @@
+FROM python:3.10-slim
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    curl \
+    unzip \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Playwright and browsers
+RUN pip install playwright
+RUN playwright install
+RUN playwright install-deps
+
+# Copy application code
+COPY . .
+
+# Set entrypoint
+ENTRYPOINT ["python", "advanced_browser_scraper.py"]

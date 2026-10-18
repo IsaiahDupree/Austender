@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Construction Opportunities</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #2a5885;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-top: none;
+            border-radius: 0 0 5px 5px;
+        }
+        .opportunity {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .title {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2a5885;
+            margin-bottom: 10px;
+        }
+        .info {
+            margin: 10px 0;
+        }
+        .label {
+            font-weight: bold;
+            display: inline-block;
+            width: 120px;
+        }
+        .buttons {
+            margin-top: 15px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #2a5885;
+            color: white;
+            text-decoration: none;
+            border-radius: 3px;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            color: #777;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>New Construction Opportunities</h1>
+        <p>{{ opportunities|length }} new opportunities found on {{ date }}</p>
+    </div>
+    
+    <div class="content">
+        <p>Hello,</p>
+        <p>We've found {{ opportunities|length }} new construction opportunities that may be of interest:</p>
+        
+        {% for opp in opportunities %}
+        <div class="opportunity">
+            <div class="title">{{ opp.title }}</div>
+            <div class="info"><span class="label">Source:</span> {{ opp.source }}</div>
+            <div class="info"><span class="label">Reference ID:</span> {{ opp.reference_id }}</div>
+            <div class="info"><span class="label">Published:</span> {{ opp.publish_date }}</div>
+            <div class="info"><span class="label">Closes:</span> {{ opp.closing_date }}</div>
+            <div class="info"><span class="label">Value:</span> {{ opp.capital_value_formatted }}</div>
+            <div class="info"><span class="label">Location:</span> {{ opp.location }}</div>
+            <div class="buttons">
+                <a href="{{ base_url }}/opportunities/{{ opp.id }}" class="button">View Details</a>
+            </div>
+        </div>
+        {% endfor %}
+        
+        <p>Visit our website to view all opportunities:</p>
+        <p><a href="{{ base_url }}/opportunities" class="button">View All Opportunities</a></p>
+        
+        <div class="footer">
+            <p>You're receiving this email because you're subscribed to construction opportunity updates.</p>
+            <p>To unsubscribe, <a href="{{ base_url }}/unsubscribe?email={{ recipient }}">click here</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

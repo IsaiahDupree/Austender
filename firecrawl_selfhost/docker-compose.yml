@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  firecrawl:
+    image: mendableai/firecrawl:latest
+    container_name: firecrawl
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - HOST=0.0.0.0
+      - USE_DB_AUTHENTICATION=false
+      - BULL_AUTH_KEY=${BULL_AUTH_KEY:-CHANGEME}
+      - PLAYWRIGHT_MICROSERVICE_URL=http://playwright-service:3000/scrape
+      - REDIS_URL=redis://redis:6379
+      - REDIS_RATE_LIMIT_URL=redis://redis:6379
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_TOKEN=${SUPABASE_ANON_TOKEN}
+      - TEST_API_KEY=${TEST_API_KEY}
+    depends_on:
+      - redis
+      - playwright-service
+    networks:
+      - firecrawl-network
+    restart: unless-stopped
+
+  playwright-service:
+    image: mendableai/firecrawl-playwright:latest
+    container_name: firecrawl-playwright
+    networks:
+      - firecrawl-network
+    restart: unless-stopped
+
+  redis:
+    image: redis:7.0-alpine
+    container_name: firecrawl-redis
+    networks:
+      - firecrawl-network
+    restart: unless-stopped
+
+networks:
+  firecrawl-network:
+    driver: bridge

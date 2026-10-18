@@ -1,0 +1,56 @@
+FROM python:3.10-slim
+
+# Install system dependencies required for Playwright
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    curl \
+    unzip \
+    libglib2.0-0 \
+    libnss3 \
+    libnspr4 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libcups2 \
+    libdrm2 \
+    libdbus-1-3 \
+    libxcb1 \
+    libxkbcommon0 \
+    libx11-6 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libgbm1 \
+    libpango-1.0-0 \
+    libcairo2 \
+    libasound2 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create app directory
+WORKDIR /app
+
+# Copy requirements first for better caching
+COPY requirements.scraper.txt .
+RUN pip install --no-cache-dir -r requirements.scraper.txt
+
+# Install Playwright
+RUN pip install --no-cache-dir playwright
+RUN playwright install chromium
+RUN playwright install-deps
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/data /app/database
+
+# Copy application code
+COPY ./advanced_browser_scraper.py .
+COPY ./opportunity_finder.py .
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV HEADLESS=true
+
+# Run the scraper with scheduler mode
+ENTRYPOINT ["python", "advanced_browser_scraper.py"]
+CMD ["--scheduler", "--interval", "12", "--sources", "austender", "--category", "construction", "--pages", "5", "--details", "--save"]

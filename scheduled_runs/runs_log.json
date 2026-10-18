@@ -1,0 +1,12 @@
+[
+  {
+    "id": "run_20250420_173039_bridge construction_NSW",
+    "timestamp": "2025-04-20T17:30:39.919608",
+    "keyword": "bridge construction",
+    "state": "NSW",
+    "success": false,
+    "data_count": 0,
+    "tool_used": null,
+    "duration_seconds": 44.91952061653137
+  }
+]

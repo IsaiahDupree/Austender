@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # Firecrawl API service
+  firecrawl-api:
+    build:
+      context: ./firecrawl_repo
+      dockerfile: Dockerfile
+    ports:
+      - "3005:3005"
+    environment:
+      - PORT=3005
+      - HOST=0.0.0.0
+      - USE_DB_AUTHENTICATION=false
+      - TEST_API_KEY=${TEST_API_KEY}
+      - BULL_AUTH_KEY=AUSTENDER_SECURE_KEY
+    depends_on:
+      - firecrawl-redis
+      - firecrawl-playwright
+    networks:
+      - scraper-network
+    restart: unless-stopped
+
+  # Redis for Firecrawl
+  firecrawl-redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - scraper-network
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  # Playwright service for Firecrawl
+  firecrawl-playwright:
+    build:
+      context: ./firecrawl_repo
+      dockerfile: playwright.Dockerfile
+    networks:
+      - scraper-network
+    restart: unless-stopped
+
+  # Our custom opportunity scraper
+  opportunity-scraper:
+    build:
+      context: .
+      dockerfile: Dockerfile.browser-scraper
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./database:/app/database
+    environment:
+      - FIRECRAWL_BASE_URL=http://firecrawl-api:3005
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      - PYTHONUNBUFFERED=1
+    depends_on:
+      - firecrawl-api
+    networks:
+      - scraper-network
+    restart: unless-stopped
+    command: ["--scheduler", "--interval", "12", "--sources", "austender", "--category", "construction", "--pages", "5", "--details", "--save"]
+
+networks:
+  scraper-network:
+    driver: bridge
+
+volumes:
+  redis-data:
